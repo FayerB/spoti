@@ -1051,3 +1051,159 @@ input { font-family: inherit; }
   .player__right { display: none; }
   .quick-picks { grid-template-columns: 1fr; }
 }
+/* ── RESPONSIVE ──────────────────────────────────────────────── */
+
+/* Tablet landscape */
+@media (max-width: 1100px) {
+  .cards-row { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); }
+  .hero__title { font-size: 2.2rem; }
+  .collection-header__title { font-size: 2.2rem; }
+}
+
+/* Tablet portrait */
+@media (max-width: 900px) {
+  :root {
+    --sidebar-w: 72px;
+    --player-h: 80px;
+  }
+
+  /* Sidebar colapsado a iconos */
+  .sidebar__logo-text,
+  .sidebar__section { display: none; }
+  .sidebar__logo { justify-content: center; padding: 1.25rem 0; }
+  .sidebar__nav { padding: 0 0.5rem; }
+  .sidebar__nav-item { justify-content: center; padding: 14px; }
+  .sidebar__nav-item span { display: none; }
+  .sidebar__active-pill { display: none; }
+
+  /* Ocultar album col en tracklist */
+  .track-list__album-col { display: none; }
+  .track-list__header,
+  .track-row { grid-template-columns: 36px 1fr 36px 52px; }
+
+  /* Hero más compacto */
+  .hero { height: 260px; }
+  .hero__title { font-size: 1.9rem; }
+  .hero__subtitle { display: none; }
+  .hero__content { left: 1.5rem; bottom: 1.5rem; }
+
+  /* Quick picks 2 columnas */
+  .quick-picks { grid-template-columns: repeat(2, 1fr); }
+
+  /* Collection header apilado */
+  .collection-header__inner { flex-direction: column; align-items: flex-start; gap: 1.25rem; }
+  .collection-header__cover-wrap { width: 160px; height: 160px; }
+  .collection-header__title { font-size: 2rem; }
+
+  /* Page padding reducido */
+  .page { padding: 1.5rem 1.25rem 3rem; }
+  .collection-body { padding: 1.5rem 1.25rem 3rem !important; }
+  .collection-header { padding: 2rem 1.25rem 1.5rem; }
+}
+
+/* Mobile */
+@media (max-width: 640px) {
+  :root {
+    --sidebar-w: 0px;
+    --player-h: 130px;
+  }
+
+  /* App pasa a columna: nav abajo, contenido arriba */
+  .app {
+    grid-template-columns: 1fr;
+    grid-template-rows: 1fr var(--player-h);
+  }
+
+  /* Sidebar se convierte en bottom nav */
+  .sidebar {
+    display: none; /* reemplazado por .bottom-nav */
+  }
+
+  /* Player ocupa ancho completo, 2 filas */
+  .player {
+    grid-column: 1 / 2;
+    grid-template-columns: 1fr;
+    grid-template-rows: auto auto;
+    padding: 10px 16px 12px;
+    gap: 8px;
+  }
+  .player__center { width: 100%; }
+  .player__track {
+    justify-content: space-between;
+    width: 100%;
+  }
+  .player__right { display: none; }
+  .player__progress-row { max-width: 100%; }
+
+  /* Main ocupa todo */
+  .main { grid-column: 1 / 2; }
+
+  /* Hero pequeño */
+  .hero { height: 200px; border-radius: 12px; }
+  .hero__title { font-size: 1.5rem; }
+  .hero__greeting { display: none; }
+
+  /* Quick picks 1 columna */
+  .quick-picks { grid-template-columns: 1fr 1fr; gap: 0.5rem; }
+  .quick-pick__img { width: 48px; height: 48px; }
+  .quick-pick__title { font-size: 0.82rem; }
+
+  /* Cards más pequeñas */
+  .cards-row { grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 0.75rem; }
+
+  /* Genre grid */
+  .genre-grid { grid-template-columns: repeat(2, 1fr); }
+
+  /* Collection header */
+  .collection-header { padding: 1.5rem 1rem 1rem; }
+  .collection-header__cover-wrap { width: 120px; height: 120px; }
+  .collection-header__title { font-size: 1.6rem; letter-spacing: -0.5px; }
+
+  /* Page */
+  .page { padding: 1rem 1rem 2rem; }
+  .collection-body { padding: 1rem 1rem 2rem !important; }
+
+  /* Tabs scroll horizontal */
+  .tabs { overflow-x: auto; padding-bottom: 4px; flex-wrap: nowrap; }
+  .tab { white-space: nowrap; }
+
+  /* Search */
+  .search-hero__title { font-size: 1.8rem; }
+  .search-box { padding: 12px 16px; }
+
+  /* Track row más compacto */
+  .track-row__thumb { width: 36px; height: 36px; }
+}
+/* ── BOTTOM NAV (mobile only) ─────────────────────────────────── */
+.bottom-nav {
+  display: none;
+}
+
+@media (max-width: 640px) {
+  .bottom-nav {
+    display: flex;
+    position: fixed;
+    bottom: var(--player-h);
+    left: 0; right: 0;
+    background: rgba(8,11,15,0.97);
+    backdrop-filter: blur(20px);
+    border-top: 1px solid var(--border);
+    z-index: 100;
+    justify-content: space-around;
+    padding: 10px 0 8px;
+  }
+  .bottom-nav__item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    color: var(--text2);
+    text-decoration: none;
+    font-size: 10px;
+    font-weight: 600;
+    padding: 4px 16px;
+    border-radius: 8px;
+    transition: color 0.15s;
+  }
+  .bottom-nav__item--active { color: var(--accent); }
+}

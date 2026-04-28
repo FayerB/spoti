@@ -12,30 +12,62 @@ export function PlayerProvider({ children }) {
   const [shuffle, setShuffle]   = useState(false);
   const [repeat, setRepeat]     = useState(false);
   const [liked, setLiked]       = useState(new Set());
-  const intervalRef = useRef(null);
+  const audioRef = useRef(new Audio());
 
   const current = idx !== null ? queue[idx] : null;
 
-  const tick = useCallback(() => {
-    setProgress(p => {
-      const next = p + (100 / ((current?.duration || 200) * 2));
-      if (next >= 100) {
-        if (repeat) return 0;
-        setIdx(i => {
-          if (shuffle) return Math.floor(Math.random() * queue.length);
-          return i < queue.length - 1 ? i + 1 : 0;
-        });
-        return 0;
-      }
-      return next;
-    });
-  }, [current, repeat, shuffle, queue.length]);
-
+  // Cambia la fuente cuando cambia el track
   useEffect(() => {
-    clearInterval(intervalRef.current);
-    if (playing) intervalRef.current = setInterval(tick, 500);
-    return () => clearInterval(intervalRef.current);
-  }, [playing, tick]);
+    const audio = audioRef.current;
+    if (!current?.src) return;
+    audio.src = current.src;
+    audio.volume = volume;
+    if (playing) audio.play().catch(() => {});
+  }, [idx]);
+
+  // Play / pause
+  useEffect(() => {
+    const audio = audioRef.current;
+    if (playing) audio.play().catch(() => {});
+    else audio.pause();
+  }, [playing]);
+
+  // Volumen
+  useEffect(() => {
+    audioRef.current.volume = volume;
+  }, [volume]);
+
+  // Repeat
+  useEffect(() => {
+    audioRef.current.loop = repeat;
+  }, [repeat]);
+
+  // Progreso real del audio
+  useEffect(() => {
+    const audio = audioRef.current;
+
+    const onTimeUpdate = () => {
+      if (!audio.duration) return;
+      setProgress((audio.currentTime / audio.duration) * 100);
+    };
+
+    const onEnded = () => {
+      if (repeat) return;
+      setIdx(i => {
+        if (i === null) return 0;
+        if (shuffle) return Math.floor(Math.random() * queue.length);
+        return i < queue.length - 1 ? i + 1 : 0;
+      });
+      setProgress(0);
+    };
+
+    audio.addEventListener("timeupdate", onTimeUpdate);
+    audio.addEventListener("ended", onEnded);
+    return () => {
+      audio.removeEventListener("timeupdate", onTimeUpdate);
+      audio.removeEventListener("ended", onEnded);
+    };
+  }, [repeat, shuffle, queue.length]);
 
   const play = useCallback((track, trackList) => {
     const list = trackList ?? TRACKS;
@@ -64,7 +96,13 @@ export function PlayerProvider({ children }) {
     setPlaying(true);
   }, [shuffle, queue.length]);
 
-  const seek = useCallback(val => setProgress(val), []);
+  // Seek real
+  const seek = useCallback(val => {
+    const audio = audioRef.current;
+    if (!audio.duration) return;
+    audio.currentTime = (val / 100) * audio.duration;
+    setProgress(val);
+  }, []);
 
   const toggleLike = useCallback(id => {
     setLiked(s => {
@@ -77,9 +115,9 @@ export function PlayerProvider({ children }) {
   return (
     <PlayerCtx.Provider value={{
       current, playing, progress, volume, shuffle, repeat, liked,
-      play, toggle, prev, next, seek,
-      setVolume, setShuffle: () => setShuffle(s => !s),
-      setRepeat: () => setRepeat(r => !r),
+      play, toggle, prev, next, seek, setVolume,
+      setShuffle: () => setShuffle(s => !s),
+      setRepeat:  () => setRepeat(r => !r),
       toggleLike,
     }}>
       {children}
